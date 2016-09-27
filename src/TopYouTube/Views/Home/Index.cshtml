@@ -1,0 +1,12 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@foreach(var video in ViewBag.VideoList)
+{
+    <h4>@video["snippet"]["title"]</h4>
+    <img src="@video["snippet"]["thumbnails"]["medium"]["url"]" />
+    <hr />
+}
