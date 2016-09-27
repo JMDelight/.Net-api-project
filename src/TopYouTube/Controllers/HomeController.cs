@@ -18,7 +18,7 @@ namespace TopYouTube.Controllers
         public IActionResult Index()
         {
             var youtubeClient = new RestClient("https://www.googleapis.com/youtube/v3/videos");
-            var youtubeRequest = new RestRequest("?part=snippet&chart=mostPopular&maxResults=15&key=" + EnvironmentVariables.youtubeApiKey);
+            var youtubeRequest = new RestRequest("?part=id&chart=mostPopular&maxResults=15&key=" + EnvironmentVariables.youtubeApiKey);
             var topVideoResponse = new RestResponse();
             Task.Run(async () =>
             {
@@ -26,8 +26,20 @@ namespace TopYouTube.Controllers
             }).Wait();
             JObject jsonTopVideoResponse = JsonConvert.DeserializeObject<JObject>(topVideoResponse.Content);
             var youtubeVideoList = jsonTopVideoResponse["items"];
-            ViewBag.VideoList = youtubeVideoList;
+            List<string> youtubeString = new List<string>();
+            foreach(var item in youtubeVideoList)
+            {
+                youtubeString.Add(item["id"].ToString());
+            }
+            ViewBag.VideoList = youtubeString;
 
+            return View();
+        }
+        public IActionResult GetVideo(string videoId)
+        {
+            ViewBag.VideoId = videoId;
+            ViewBag.ResultId = "result-" + videoId;
+            ViewBag.PLayerId = "player-" + videoId;
             return View();
         }
 

@@ -4,9 +4,57 @@
 @{
 }
 
-@foreach(var video in ViewBag.VideoList)
+@foreach (var video in ViewBag.VideoList)
 {
-    <h4>@video["snippet"]["title"]</h4>
-    <img src="@video["snippet"]["thumbnails"]["medium"]["url"]" />
-    <hr />
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    <div id="@video">
+
+    </div>
 }
+
+<script>
+    // 2. This code loads the IFrame Player API code asynchronously.
+    var videoIdList = @Html.Raw(Json.Serialize(ViewBag.VideoList));
+
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // 3. This function creates an <iframe> (and YouTube player)
+    //    after the API code downloads.
+
+    function onYouTubeIframeAPIReady() {
+        videoIdList.forEach(videoId, function(){
+            player = new YT.Player(videoId, {
+                height: '390',
+                width: '640',
+                videoId: '@ViewBag.VideoId',
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+        })
+    });
+    }
+
+    // 4. The API will call this function when the video player is ready.
+    function onPlayerReady(event) {
+    event.target.playVideo();
+    }
+
+    // 5. The API calls this function when the player's state changes.
+    //    The function indicates that when playing a video (state=1),
+    //    the player should play for six seconds and then stop.
+    var done = false;
+    function onPlayerStateChange(event) {
+    if (event.data == YT.PlayerState.PLAYING && !done) {
+        setTimeout(stopVideo, 6000);
+        done = true;
+    }
+    }
+    function stopVideo() {
+    //player.stopVideo();
+    }
+</script>
